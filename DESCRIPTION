@@ -1,5 +1,5 @@
 Package: AusAddressR
-Title: Geocode Australian addresses using GNAF dataset locally
+Title: Geocode Australian addresses using GNAF dataset locally in R
 Version: 0.0.0.9000
 Authors@R: person("John", "Buswell", email = "john.buswell@uqconnect.edu.au", role = c("aut", "cre"))
 Description: Using the now openly available PSMA GNAF (Geocoded - National Address File) for Australia, this

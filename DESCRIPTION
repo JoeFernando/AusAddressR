@@ -1,9 +1,12 @@
 Package: AusAddressR
-Title: What the Package Does (one line, title case)
+Title: Geocode Australian addresses using GNAF dataset locally
 Version: 0.0.0.9000
-Authors@R: person("First", "Last", email = "first.last@example.com", role = c("aut", "cre"))
-Description: What the package does (one paragraph).
+Authors@R: person("John", "Buswell", email = "john.buswell@uqconnect.edu.au", role = c("aut", "cre"))
+Description: Using the now openly available PSMA GNAF (Geocoded - National Address File) for Australia, this
+  will geocode addresses that are available in a string format
 Depends: R (>= 3.3.0)
-License: What license is it under?
+License: MIT + file LICENCE
 Encoding: UTF-8
 LazyData: true
+URL: https://github.com/JohnBuswell/AusAddressR
+BugReports: https://github.com/JohnBuswell/AusAddressR/issues

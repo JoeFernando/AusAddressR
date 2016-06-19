@@ -3,7 +3,7 @@ Title: Geocode Australian addresses using GNAF dataset locally in R
 Version: 0.0.0.9000
 Authors@R: person("John", "Buswell", email = "john.buswell@uqconnect.edu.au", role = c("aut", "cre"))
 Description: Using the now openly available PSMA GNAF (Geocoded - National Address File) for Australia, this
-  will geocode addresses that are available in a string format
+  will geocode addresses that are available in a string format using R and SQLite as a database.
 Depends: R (>= 3.3.0)
 License: MIT + file LICENCE
 Encoding: UTF-8

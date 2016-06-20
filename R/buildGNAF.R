@@ -10,6 +10,7 @@
 #' @examples
 #' buildGNAF('~/GNAF')
 buildGNAF <- function(path=NULL){
+  require(RSQLite)
   message("* Not doing anything yet")
   return(TRUE)
 }

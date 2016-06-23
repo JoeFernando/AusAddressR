@@ -4,7 +4,7 @@
 \alias{buildGNAF}
 \title{buildGNAF}
 \usage{
-buildGNAF(path = NULL)
+buildGNAF(gnafPath, writePath = NULL)
 }
 \arguments{
 \item{path}{The path to GNAF data directory}

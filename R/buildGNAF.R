@@ -9,6 +9,7 @@
 #'
 #' @examples
 #' buildGNAF('~/GNAF')
+#' buildGNAF('~/Downloads/MAY16_GNAF+EULA_PipeSeparatedValue_20160523140820.zip',writePath = '~/Downloads',Overwrite = T)
 buildGNAF <- function(gnafPath, writePath=NULL, Overwrite = F){
   require(MonetDBLite)
   require(DBI)
@@ -45,6 +46,7 @@ buildGNAF <- function(gnafPath, writePath=NULL, Overwrite = F){
 #' @export
 #'
 #' @examples
+#' #' createTables('~/Downloads/GNAF')
 createTables <- function(GNAFDirectory, Overwrite = F){
   require(MonetDBLite)
   require(DBI)
@@ -77,6 +79,7 @@ createTables <- function(GNAFDirectory, Overwrite = F){
         queryStub = ''
       }else{
         tryCatch({
+          print(queryStub)
           db = dbConnect(MonetDBLite(),paste0(GNAFDirectory,"/GNAF.db"))
           dbSendQuery(db, queryStub)
           dbDisconnect(db)
@@ -107,16 +110,50 @@ createTables <- function(GNAFDirectory, Overwrite = F){
   return(TRUE)
 }
 
-#' Title
+#' insert Data
 #'
 #' @param GNAFDirectory
 #'
-#' @return
+#' @return T
 #' @export
 #'
 #' @examples
+#' #'insertData('~/Downloads/GNAF')
 insertData <- function(GNAFDirectory){
+  require(MonetDBLite)
+  require(DBI)
+  dataExt = list.files(GNAFDirectory,pattern='.psv',recursive = T,ignore.case = T)
 
+  db = dbConnect(MonetDBLite(),paste0(GNAFDirectory,"/GNAF.db"))
+  dataTables = dbListTables(db)
+  dbDisconnect(db)
+
+  for(table in dataTables){
+    print(table)
+    dataExtTable = dataFiles[grepl(table,dataFiles,ignore.case = T)]
+    db = dbConnect(MonetDBLite(),paste0(GNAFDirectory,"/GNAF.db"))
+    DBI::dbSendQuery(db,paste0('delete from ',table))
+    dbDisconnect(db)
+    for(file in dataExtTable){
+      print(file)
+      print('Size')
+      print(file.size(paste0(GNAFDirectory,"/",file)))
+      ptm <- proc.time()
+      db = dbConnect(MonetDBLite(),paste0(GNAFDirectory,"/GNAF.db"))
+      monetdb.read.csv(conn = db
+                     ,files = paste0(GNAFDirectory,"/",file)
+                     ,tablename = table
+                     ,header = T
+                     ,delim = "|"
+                     ,create = F
+
+      )
+      dbDisconnect(db)
+      print('Time')
+      print(proc.time()-ptm)
+    }
+
+  }
 }
 
 

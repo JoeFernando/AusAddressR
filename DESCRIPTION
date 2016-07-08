@@ -14,4 +14,6 @@ URL: https://github.com/JohnBuswell/AusAddressR
 BugReports: https://github.com/JohnBuswell/AusAddressR/issues
 RoxygenNote: 5.0.1
 Suggests: testthat
-Imports: RSQLite
+Imports: RSQLite,
+    MonetDBLite,
+    DBI

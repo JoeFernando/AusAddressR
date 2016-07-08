@@ -107,6 +107,16 @@ createTables <- function(GNAFDirectory, Overwrite = F){
   return(TRUE)
 }
 
+#' Title
+#'
+#' @param GNAFDirectory
+#'
+#' @return
+#' @export
+#'
+#' @examples
+insertData <- function(GNAFDirectory){
 
+}
 
 

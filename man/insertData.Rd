@@ -16,6 +16,6 @@ T
 insert Data
 }
 \examples{
-#'insertData(GNAFDirectory)
+#'insertData('~/Downloads/GNAF')
 }
 

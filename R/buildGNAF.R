@@ -49,13 +49,14 @@ buildGNAF <- function(gnafPath, writePath=NULL, Overwrite = F){
 #'
 #' @examples
 #' #' createTables('~/Downloads/GNAF')
-createTables <- function(GNAFDirectory){
+createTables <- function(GNAFDirectory, overwrite = F, tablesFlag = T, keysFlag = F){
   require(MonetDBLite)
   require(DBI)
   tryCatch({
   if(!dir.exists(paste0(GNAFDirectory,"/GNAF.db"))){
     stop('Database needs to be created')
   }
+
 
   createTablesScriptLocation = list.files(GNAFDirectory,pattern='create_tables_ansi.sql',recursive = T,ignore.case = T)
   createKeysScriptLocation = list.files(GNAFDirectory,pattern='add_fk_constraints.sql',recursive = T,ignore.case = T)
@@ -68,33 +69,47 @@ createTables <- function(GNAFDirectory){
     stop('More than one create keys script!')
   }
   print('We good. Doing stuff now...')
-  files = c(createTablesScriptLocation,createKeysScriptLocation
+  if(tablesFlag&keysFlag){
+  files = c(createTablesScriptLocation
+            ,createKeysScriptLocation
             )
-  query = readLines(paste0(GNAFDirectory,"/",createTablesScriptLocation))
+  }else if(tablesFlag & !keysFlag){
+    files = c(createTablesScriptLocation)
+  }else if(!tablesFlag & keysFlag){
+    files = c(createKeysScriptLocation)
+  }else{
+    files = c()
+  }
 
-  queryStub = ''
-  for(file in files)
-  for(line in query){
-    queryStub = paste0(queryStub,line)
-    if(grepl(";",queryStub)){
-      if(grepl("DROP TABLE",queryStub)){
-        queryStub = ''
-      }else{
-        tryCatch({
-          print(queryStub)
-          db = dbConnect(MonetDBLite(),paste0(GNAFDirectory,"/GNAF.db"))
-          dbSendQuery(db, queryStub)
-          dbDisconnect(db)
-        }, error = function(err){
-          print(err)
-          print('Pushing through...')
-        }, finally = {
+  queryStub = ""
+  for(file in files){
+    query = readLines(paste0(GNAFDirectory,"/",file))
+    for(line in query){
+      if(grepl("--",line)){
+        line = ""
+      }
+
+      queryStub = paste0(queryStub,line)
+
+      if(grepl(";",queryStub)){
+        if(grepl("DROP TABLE",queryStub) & !overwrite){
           queryStub = ''
-        })
+        }else{
+          tryCatch({
+            print(queryStub)
+            db = dbConnect(MonetDBLite(),paste0(GNAFDirectory,"/GNAF.db"))
+            dbSendQuery(db, queryStub)
+            dbDisconnect(db)
+          }, error = function(err){
+            print(err)
+            print('Pushing through...')
+          }, finally = {
+            queryStub = ''
+          })
+        }
       }
     }
   }
-
 
   db = dbConnect(MonetDBLite(),paste0(GNAFDirectory,"/GNAF.db"))
   print(DBI::dbListTables(db))
@@ -121,18 +136,19 @@ createTables <- function(GNAFDirectory){
 #'
 #' @examples
 #' #'insertData('~/Downloads/GNAF')
-insertData <- function(GNAFDirectory){
+insertData <- function(GNAFDirectory, dataTables = NULL){
   require(MonetDBLite)
   require(DBI)
   dataExt = list.files(GNAFDirectory,pattern='.psv',recursive = T,ignore.case = T)
-
-  db = dbConnect(MonetDBLite(),paste0(GNAFDirectory,"/GNAF.db"))
-  dataTables = dbListTables(db)
-  dbDisconnect(db)
+  if(is.null(dataTables)){
+    db = dbConnect(MonetDBLite(),paste0(GNAFDirectory,"/GNAF.db"))
+    dataTables = dbListTables(db)
+    dbDisconnect(db)
+  }
 
   for(table in dataTables){
     print(table)
-    dataExtTable = dataExt[grepl(table,dataExt,ignore.case = T)]
+    dataExtTable = dataExt[grepl(paste0(table,"_psv.psv"),dataExt,ignore.case = T)]
     db = dbConnect(MonetDBLite(),paste0(GNAFDirectory,"/GNAF.db"))
     DBI::dbSendQuery(db,paste0('delete from ',table))
     dbDisconnect(db)
@@ -147,6 +163,7 @@ insertData <- function(GNAFDirectory){
                      ,tablename = table
                      ,header = T
                      ,delim = "|"
+                     ,quote = ""
                      ,create = F
 
       )

@@ -4,7 +4,7 @@
 \alias{createTables}
 \title{createTables}
 \usage{
-createTables(GNAFDirectory, Overwrite = F)
+createTables(GNAFDirectory, overwrite)
 }
 \arguments{
 \item{GNAFDirectory}{}
@@ -16,6 +16,6 @@ T
 Creates GNAF table structure
 }
 \examples{
-#' createTables(GNAFDirectory)
+#' createTables('~/Downloads/GNAF')
 }
 

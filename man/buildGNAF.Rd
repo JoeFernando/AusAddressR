@@ -17,5 +17,8 @@ Builds the SQLite database that will house the GNAF data used to geocode
 }
 \examples{
 buildGNAF('~/GNAF')
+buildGNAF('~/Downloads/MAY16_GNAF+EULA_PipeSeparatedValue_20160523140820.zip'
+           ,writePath = '~/Downloads'
+           ,Overwrite = T)
 }
 

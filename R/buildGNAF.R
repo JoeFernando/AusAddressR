@@ -9,7 +9,9 @@
 #'
 #' @examples
 #' buildGNAF('~/GNAF')
-#' buildGNAF('~/Downloads/MAY16_GNAF+EULA_PipeSeparatedValue_20160523140820.zip',writePath = '~/Downloads',Overwrite = T)
+#' buildGNAF('~/Downloads/MAY16_GNAF+EULA_PipeSeparatedValue_20160523140820.zip'
+#'            ,writePath = '~/Downloads'
+#'            ,Overwrite = T)
 buildGNAF <- function(gnafPath, writePath=NULL, Overwrite = F){
   require(MonetDBLite)
   require(DBI)
@@ -47,7 +49,7 @@ buildGNAF <- function(gnafPath, writePath=NULL, Overwrite = F){
 #'
 #' @examples
 #' #' createTables('~/Downloads/GNAF')
-createTables <- function(GNAFDirectory, Overwrite = F){
+createTables <- function(GNAFDirectory){
   require(MonetDBLite)
   require(DBI)
   tryCatch({
@@ -75,7 +77,7 @@ createTables <- function(GNAFDirectory, Overwrite = F){
   for(line in query){
     queryStub = paste0(queryStub,line)
     if(grepl(";",queryStub)){
-      if(grepl("DROP TABLE",queryStub) && Overwrite == F){
+      if(grepl("DROP TABLE",queryStub)){
         queryStub = ''
       }else{
         tryCatch({
@@ -130,7 +132,7 @@ insertData <- function(GNAFDirectory){
 
   for(table in dataTables){
     print(table)
-    dataExtTable = dataFiles[grepl(table,dataFiles,ignore.case = T)]
+    dataExtTable = dataExt[grepl(table,dataExt,ignore.case = T)]
     db = dbConnect(MonetDBLite(),paste0(GNAFDirectory,"/GNAF.db"))
     DBI::dbSendQuery(db,paste0('delete from ',table))
     dbDisconnect(db)

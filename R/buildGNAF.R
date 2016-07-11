@@ -18,7 +18,7 @@ buildGNAF <- function(gnafPath, writePath=NULL, Overwrite = F){
   tryCatch(
     {
       writePathDir = paste0(writePath,'/GNAF')
-      if(grep('\\.zip$',gnafPath)){
+      if(grepl('\\.zip$',gnafPath)){
         if(!dir.exists(writePathDir)){
           dir.create(writePathDir)
         }
@@ -48,8 +48,8 @@ buildGNAF <- function(gnafPath, writePath=NULL, Overwrite = F){
 #' @export
 #'
 #' @examples
-#' #' createTables('~/Downloads/GNAF')
-createTables <- function(GNAFDirectory, overwrite = F, tablesFlag = T, keysFlag = F){
+#' #' createTables('~/Downloads/GNAF', overwrite = T, tablesFlag = T, keysFlag = T)
+createTables <- function(GNAFDirectory, overwrite = F, tablesFlag = T, PKFlag = T, FKFlag = F){
   require(MonetDBLite)
   require(DBI)
   tryCatch({
@@ -69,17 +69,10 @@ createTables <- function(GNAFDirectory, overwrite = F, tablesFlag = T, keysFlag 
     stop('More than one create keys script!')
   }
   print('We good. Doing stuff now...')
-  if(tablesFlag&keysFlag){
   files = c(createTablesScriptLocation
             ,createKeysScriptLocation
             )
-  }else if(tablesFlag & !keysFlag){
-    files = c(createTablesScriptLocation)
-  }else if(!tablesFlag & keysFlag){
-    files = c(createKeysScriptLocation)
-  }else{
-    files = c()
-  }
+
 
   queryStub = ""
   for(file in files){
@@ -94,7 +87,12 @@ createTables <- function(GNAFDirectory, overwrite = F, tablesFlag = T, keysFlag 
       if(grepl(";",queryStub)){
         if(grepl("DROP TABLE",queryStub) & !overwrite){
           queryStub = ''
-        }else{
+        }else if(grepl("PRIMARY KEY",queryStub)&!PKFlag){
+          queryStub = ''
+        }else if(grepl("FOREIGN KEY", queryStub)&!FKFlag){
+          queryStub = ''
+        }
+        else{
           tryCatch({
             print(queryStub)
             db = dbConnect(MonetDBLite(),paste0(GNAFDirectory,"/GNAF.db"))
@@ -140,6 +138,10 @@ insertData <- function(GNAFDirectory, dataTables = NULL){
   require(MonetDBLite)
   require(DBI)
   dataExt = list.files(GNAFDirectory,pattern='.psv',recursive = T,ignore.case = T)
+
+  dataExtSearch = substr(dataExt,regexpr("/[^/]*$",dataExt),nchar(dataExt))
+  dataExtSearch2 = substr(dataExtSearch,regexpr("_",dataExtSearch),nchar(dataExtSearch))
+
   if(is.null(dataTables)){
     db = dbConnect(MonetDBLite(),paste0(GNAFDirectory,"/GNAF.db"))
     dataTables = dbListTables(db)
@@ -148,7 +150,14 @@ insertData <- function(GNAFDirectory, dataTables = NULL){
 
   for(table in dataTables){
     print(table)
-    dataExtTable = dataExt[grepl(paste0(table,"_psv.psv"),dataExt,ignore.case = T)]
+    print(paste0("_",table,"_psv.psv"))
+
+    if(grepl("_AUT_psv.psv",table)){
+      dataExtTable = dataExt[grepl(paste0("^_Code_",table,"_psv.psv"),dataExtSearch2,ignore.case=T)]
+    }else{
+      dataExtTable = dataExt[grepl(paste0("^_",table,"_psv.psv"),dataExtSearch2,ignore.case=T)]
+    }
+
     db = dbConnect(MonetDBLite(),paste0(GNAFDirectory,"/GNAF.db"))
     DBI::dbSendQuery(db,paste0('delete from ',table))
     dbDisconnect(db)

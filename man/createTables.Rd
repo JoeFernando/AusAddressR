@@ -4,7 +4,7 @@
 \alias{createTables}
 \title{createTables}
 \usage{
-createTables(GNAFDirectory, overwrite)
+createTables(GNAFDirectory, overwrite = F, tablesFlag = T, keysFlag = F)
 }
 \arguments{
 \item{GNAFDirectory}{}

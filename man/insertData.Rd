@@ -4,7 +4,7 @@
 \alias{insertData}
 \title{insert Data}
 \usage{
-insertData(GNAFDirectory)
+insertData(GNAFDirectory, dataTables = NULL)
 }
 \arguments{
 \item{GNAFDirectory}{}
